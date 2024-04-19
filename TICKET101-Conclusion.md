@@ -9,3 +9,4 @@
 
 - **Shortcoming**: The code could benefit from better use of Java’s inheritance. The way the intern did it makes the code less readable and maintainable. For instance, multiple exceptions in the decision engine could be generalized to a parent exception class. The intern created several identical exception classes, violating the DRY principle. This could be improved by creating a parent class, DecisionEngineException, for common functionality. This approach enhances readability, maintainability, and adherence to DRY principles.  
 - **Frontend**: The loan period slider had the minimum value displayed as 6 months when per the requirements the minimum loan period is 12 months.
+- **Readability and Single Responsibility Principle**: Some of the methods were too large and doing too many things. I extracted bigger methods into smaller ones and made each method have a single functionality
