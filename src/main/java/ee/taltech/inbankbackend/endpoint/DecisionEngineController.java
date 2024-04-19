@@ -1,11 +1,11 @@
 package ee.taltech.inbankbackend.endpoint;
 
-import ee.taltech.inbankbackend.exceptions.InvalidLoanAmountException;
-import ee.taltech.inbankbackend.exceptions.InvalidLoanPeriodException;
-import ee.taltech.inbankbackend.exceptions.InvalidPersonalCodeException;
-import ee.taltech.inbankbackend.exceptions.NoValidLoanException;
+import ee.taltech.inbankbackend.builders.ResponseBuilder;
+import ee.taltech.inbankbackend.config.DecisionEngineConstants;
+import ee.taltech.inbankbackend.exceptions.*;
 import ee.taltech.inbankbackend.service.Decision;
 import ee.taltech.inbankbackend.service.DecisionEngine;
+import ee.taltech.inbankbackend.validators.RequestValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,31 +45,49 @@ public class DecisionEngineController {
     @PostMapping("/decision")
     public ResponseEntity<DecisionResponse> requestDecision(@RequestBody DecisionRequest request) {
         try {
-            Decision decision = decisionEngine.
-                    calculateApprovedLoan(request.getPersonalCode(), request.getLoanAmount(), request.getLoanPeriod());
-            response.setLoanAmount(decision.getLoanAmount());
-            response.setLoanPeriod(decision.getLoanPeriod());
-            response.setErrorMessage(decision.getErrorMessage());
-
-            return ResponseEntity.ok(response);
-        } catch (InvalidPersonalCodeException | InvalidLoanAmountException | InvalidLoanPeriodException e) {
-            response.setLoanAmount(null);
-            response.setLoanPeriod(null);
-            response.setErrorMessage(e.getMessage());
-
-            return ResponseEntity.badRequest().body(response);
+            return processDecisionRequest(request);
+        } catch (InvalidInputException e) {
+            return handleBadRequest(e.getMessage());
         } catch (NoValidLoanException e) {
-            response.setLoanAmount(null);
-            response.setLoanPeriod(null);
-            response.setErrorMessage(e.getMessage());
-
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            return handleNotFound(e.getMessage());
         } catch (Exception e) {
-            response.setLoanAmount(null);
-            response.setLoanPeriod(null);
-            response.setErrorMessage("An unexpected error occurred");
-
-            return ResponseEntity.internalServerError().body(response);
+            return handleInternalServerError();
         }
     }
+
+    private ResponseEntity<DecisionResponse> processDecisionRequest(DecisionRequest request) throws InvalidInputException, NoValidLoanException {
+        Decision decision = decisionEngine.calculateApprovedLoan(request.getPersonalCode(), request.getLoanAmount(), request.getLoanPeriod());
+        DecisionResponse response = buildResponse(decision);
+        return ResponseEntity.ok(response);
+    }
+
+    private DecisionResponse buildResponse(Decision decision) {
+        return new ResponseBuilder()
+                .setLoanAmount(decision.getLoanAmount())
+                .setLoanPeriod(decision.getLoanPeriod())
+                .setErrorMessage(decision.getErrorMessage())
+                .build();
+    }
+
+    private ResponseEntity<DecisionResponse> handleBadRequest(String errorMessage) {
+        DecisionResponse response = buildErrorResponse(errorMessage);
+        return ResponseEntity.badRequest().body(response);
+    }
+
+    private ResponseEntity<DecisionResponse> handleNotFound(String errorMessage) {
+        DecisionResponse response = buildErrorResponse(errorMessage);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+    }
+
+    private ResponseEntity<DecisionResponse> handleInternalServerError() {
+        DecisionResponse response = buildErrorResponse(DecisionEngineConstants.ERROR_UNEXPECTED);
+        return ResponseEntity.internalServerError().body(response);
+    }
+
+    private DecisionResponse buildErrorResponse(String errorMessage) {
+        return new ResponseBuilder()
+                .setErrorMessage(errorMessage)
+                .build();
+    }
+
 }
