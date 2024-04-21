@@ -56,7 +56,7 @@ public class DecisionEngineController {
     }
 
     private ResponseEntity<DecisionResponse> processDecisionRequest(DecisionRequest request) throws InvalidInputException, NoValidLoanException {
-        Decision decision = decisionEngine.calculateApprovedLoan(request.getPersonalCode(), request.getLoanAmount(), request.getLoanPeriod());
+        Decision decision = decisionEngine.calculateApprovedLoan(request);
         DecisionResponse response = buildResponse(decision);
         return ResponseEntity.ok(response);
     }
