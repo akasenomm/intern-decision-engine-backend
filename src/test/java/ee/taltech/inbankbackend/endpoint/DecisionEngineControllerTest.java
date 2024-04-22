@@ -51,7 +51,7 @@ public class DecisionEngineControllerTest {
     public void givenValidRequest_whenRequestDecision_thenReturnsExpectedResponse()
             throws Exception, DecisionEngineException {
         Decision decision = new Decision(1000, 12, null);
-        when(decisionEngine.calculateApprovedLoan(any(DecisionRequest.class))).thenReturn(decision);
+        when(decisionEngine.calculateApprovedLoan(anyString(), anyLong(), anyInt())).thenReturn(decision);
 
         DecisionRequest request = new DecisionRequest("1234", 10L, 10);
 
@@ -78,7 +78,7 @@ public class DecisionEngineControllerTest {
     @Test
     public void givenInvalidPersonalCode_whenRequestDecision_thenReturnsBadRequest()
             throws Exception, DecisionEngineException {
-        when(decisionEngine.calculateApprovedLoan(any(DecisionRequest.class)))
+        when(decisionEngine.calculateApprovedLoan(anyString(), anyLong(), anyInt()))
                 .thenThrow(new InvalidPersonalCodeException("Invalid personal code"));
 
         DecisionRequest request = new DecisionRequest("1234", 10L, 10);
@@ -106,7 +106,7 @@ public class DecisionEngineControllerTest {
     @Test
     public void givenInvalidLoanAmount_whenRequestDecision_thenReturnsBadRequest()
             throws Exception, DecisionEngineException {
-        when(decisionEngine.calculateApprovedLoan(any(DecisionRequest.class)))
+        when(decisionEngine.calculateApprovedLoan(anyString(), anyLong(), anyInt()))
                 .thenThrow(new InvalidLoanAmountException("Invalid loan amount"));
 
         DecisionRequest request = new DecisionRequest("1234", 10L, 10);
@@ -134,7 +134,7 @@ public class DecisionEngineControllerTest {
     @Test
     public void givenInvalidLoanPeriod_whenRequestDecision_thenReturnsBadRequest()
             throws Exception, DecisionEngineException {
-        when(decisionEngine.calculateApprovedLoan(any(DecisionRequest.class)))
+        when(decisionEngine.calculateApprovedLoan(anyString(), anyLong(), anyInt()))
                 .thenThrow(new InvalidLoanPeriodException("Invalid loan period"));
 
         DecisionRequest request = new DecisionRequest("1234", 10L, 10);
@@ -162,7 +162,7 @@ public class DecisionEngineControllerTest {
     @Test
     public void givenNoValidLoan_whenRequestDecision_thenReturnsBadRequest()
             throws Exception, DecisionEngineException {
-        when(decisionEngine.calculateApprovedLoan(any(DecisionRequest.class)))
+        when(decisionEngine.calculateApprovedLoan(anyString(), anyLong(), anyInt()))
                 .thenThrow(new NoValidLoanException("No valid loan available"));
 
         DecisionRequest request = new DecisionRequest("1234", 1000L, 12);
@@ -190,7 +190,7 @@ public class DecisionEngineControllerTest {
     @Test
     public void givenUnexpectedError_whenRequestDecision_thenReturnsInternalServerError()
             throws Exception, DecisionEngineException {
-        when(decisionEngine.calculateApprovedLoan(any(DecisionRequest.class))).thenThrow(new RuntimeException());
+        when(decisionEngine.calculateApprovedLoan(anyString(), anyLong(), anyInt())).thenThrow(new RuntimeException());
 
         DecisionRequest request = new DecisionRequest("1234", 10L, 10);
 

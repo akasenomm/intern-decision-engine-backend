@@ -25,10 +25,10 @@ public class DecisionEngine {
      * @throws NoValidLoanException If there is no valid loan found for the given ID code, loan amount and loan period
      */
 
-    public Decision calculateApprovedLoan(DecisionRequest request) throws NoValidLoanException, InvalidInputException {
-        RequestValidator.verifyInputs(request);
-        modifier = calculateModifier(request.getPersonalCode());
-        int outputLoanPeriod = adjustLoanPeriod(request.getLoanPeriod());
+    public Decision calculateApprovedLoan(String personalCode, Long loanAmount, int loanPeriod) throws NoValidLoanException, InvalidInputException {
+        RequestValidator.verifyInputs(personalCode, loanAmount, loanPeriod);
+        modifier = calculateModifier(personalCode);
+        int outputLoanPeriod = adjustLoanPeriod(loanPeriod);
         int outputLoanAmount = calculateOutputLoanAmount(outputLoanPeriod);
         return new Decision(outputLoanAmount, outputLoanPeriod, null);
     }

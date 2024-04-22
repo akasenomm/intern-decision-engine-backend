@@ -45,7 +45,7 @@ public class DecisionEngineController {
     @PostMapping("/decision")
     public ResponseEntity<DecisionResponse> requestDecision(@RequestBody DecisionRequest request) {
         try {
-            return processDecisionRequest(request);
+            return processDecisionRequest(request.getPersonalCode(), request.getLoanAmount(), request.getLoanPeriod());
         } catch (InvalidInputException e) {
             return handleBadRequest(e.getMessage());
         } catch (NoValidLoanException e) {
@@ -55,8 +55,8 @@ public class DecisionEngineController {
         }
     }
 
-    private ResponseEntity<DecisionResponse> processDecisionRequest(DecisionRequest request) throws InvalidInputException, NoValidLoanException {
-        Decision decision = decisionEngine.calculateApprovedLoan(request);
+    private ResponseEntity<DecisionResponse> processDecisionRequest(String personalCode, Long loanAmount, int loanPeriod) throws InvalidInputException, NoValidLoanException {
+        Decision decision = decisionEngine.calculateApprovedLoan(personalCode, loanAmount, loanPeriod);
         DecisionResponse response = buildResponse(decision);
         return ResponseEntity.ok(response);
     }
