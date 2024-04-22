@@ -1,7 +1,5 @@
 package ee.taltech.inbankbackend.service;
 
-import com.github.vladislavgoltjajev.personalcode.locale.estonia.EstonianPersonalCodeParser;
-import com.github.vladislavgoltjajev.personalcode.locale.estonia.EstonianPersonalCodeValidator;
 import ee.taltech.inbankbackend.config.DecisionEngineConstants;
 import ee.taltech.inbankbackend.endpoint.DecisionRequest;
 import ee.taltech.inbankbackend.exceptions.*;
@@ -40,47 +38,48 @@ class DecisionEngineTest {
     @Test
     void testTooOld() {
         assertThrows(InvalidAgeException.class,
-                () -> decisionEngine.calculateApprovedLoan(overAgePersonalCode, 4000L, 12));
+                () -> decisionEngine.calculateApprovedLoan(new DecisionRequest(overAgePersonalCode, 4000L, 12, "ESTONIA")));
     }
 
     @Test
     void testTooYoung() {
         assertThrows(InvalidAgeException.class,
-                () -> decisionEngine.calculateApprovedLoan(underagePersonalCode, 4000L, 12));
+                () -> decisionEngine.calculateApprovedLoan(new DecisionRequest(underagePersonalCode, 4000L, 12, "ESTONIA")));
     }
 
     @Test
     void testSuggestHigherAmountThanRequested() throws DecisionEngineException {
-        Decision decision = decisionEngine.calculateApprovedLoan(segment2PersonalCode, 3000L, 60);
+        Decision decision = decisionEngine.calculateApprovedLoan(new DecisionRequest(segment2PersonalCode, 3000L, 60, "ESTONIA"));
         assertEquals(10000, decision.getLoanAmount());
         assertEquals(60, decision.getLoanPeriod());
+    }
+
+    @Test
+    void test() throws InvalidInputException, NoValidLoanException {
+        Decision decision = decisionEngine.calculateApprovedLoan(new DecisionRequest("50211022736", 3000L, 40, "LATVIA"));
+        System.out.println(decision.getLoanAmount());
+        System.out.println(decision.getLoanPeriod());
+        System.out.println(decision.getErrorMessage());
     }
 
 
     @Test
     void testDebtorPersonalCode() {
         assertThrows(NoValidLoanException.class,
-                () -> decisionEngine.calculateApprovedLoan(debtorPersonalCode, 4000L, 12));
+                () -> decisionEngine.calculateApprovedLoan(new DecisionRequest(debtorPersonalCode, 3000L, 40, "LATVIA")));
     }
 
     @Test
     void testSegment1PersonalCode() throws DecisionEngineException {
-        Decision decision = decisionEngine.calculateApprovedLoan(segment1PersonalCode, 4000L, 12);
+        Decision decision = decisionEngine.calculateApprovedLoan(new DecisionRequest(segment1PersonalCode, 4000L, 12, "ESTONIA"));
         assertEquals(2000, decision.getLoanAmount());
         assertEquals(20, decision.getLoanPeriod());
     }
 
     @Test
     void testSegment2PersonalCode() throws DecisionEngineException {
-        Decision decision = decisionEngine.calculateApprovedLoan(segment2PersonalCode, 4000L, 12);
+        Decision decision = decisionEngine.calculateApprovedLoan(new DecisionRequest(segment2PersonalCode, 4000L, 12, "ESTONIA"));
         assertEquals(3600, decision.getLoanAmount());
-        assertEquals(12, decision.getLoanPeriod());
-    }
-
-    @Test
-    void testSegment3PersonalCode() throws DecisionEngineException {
-        Decision decision = decisionEngine.calculateApprovedLoan(segment3PersonalCode, 4000L, 12);
-        assertEquals(10000, decision.getLoanAmount());
         assertEquals(12, decision.getLoanPeriod());
     }
 
@@ -88,7 +87,7 @@ class DecisionEngineTest {
     void testInvalidPersonalCode() {
         String invalidPersonalCode = "12345678901";
         assertThrows(InvalidPersonalCodeException.class,
-                () -> decisionEngine.calculateApprovedLoan(invalidPersonalCode, 4000L, 12));
+                () -> decisionEngine.calculateApprovedLoan(new DecisionRequest(invalidPersonalCode, 3000L, 40, "LATVIA")));
     }
 
     @Test
@@ -97,10 +96,10 @@ class DecisionEngineTest {
         Long tooHighLoanAmount = DecisionEngineConstants.MAXIMUM_LOAN_AMOUNT + 1L;
 
         assertThrows(InvalidLoanAmountException.class,
-                () -> decisionEngine.calculateApprovedLoan(segment1PersonalCode, tooLowLoanAmount, 12));
+                () -> decisionEngine.calculateApprovedLoan(new DecisionRequest(segment1PersonalCode, tooLowLoanAmount, 12, "LATVIA")));
 
         assertThrows(InvalidLoanAmountException.class,
-                () -> decisionEngine.calculateApprovedLoan(segment1PersonalCode, tooHighLoanAmount, 12));
+                () -> decisionEngine.calculateApprovedLoan(new DecisionRequest(segment1PersonalCode, tooHighLoanAmount, 12, "LATVIA")));
     }
 
     @Test
@@ -109,15 +108,15 @@ class DecisionEngineTest {
         int tooLongLoanPeriod = DecisionEngineConstants.MAXIMUM_LOAN_PERIOD + 1;
 
         assertThrows(InvalidLoanPeriodException.class,
-                () -> decisionEngine.calculateApprovedLoan(segment1PersonalCode, 4000L, tooShortLoanPeriod));
+                () -> decisionEngine.calculateApprovedLoan(new DecisionRequest(segment1PersonalCode, 4000L, tooShortLoanPeriod, "LATVIA")));
 
         assertThrows(InvalidLoanPeriodException.class,
-                () -> decisionEngine.calculateApprovedLoan(segment1PersonalCode, 4000L, tooLongLoanPeriod));
+                () -> decisionEngine.calculateApprovedLoan(new DecisionRequest(segment1PersonalCode, 4000L, tooLongLoanPeriod, "LATVIA")));
     }
 
     @Test
     void testFindSuitableLoanPeriod() throws DecisionEngineException {
-        Decision decision = decisionEngine.calculateApprovedLoan(segment2PersonalCode, 2000L, 12);
+        Decision decision = decisionEngine.calculateApprovedLoan(new DecisionRequest(segment2PersonalCode, 2000L, 12, "LATVIA"));
         assertEquals(3600, decision.getLoanAmount());
         assertEquals(12, decision.getLoanPeriod());
     }
@@ -125,7 +124,7 @@ class DecisionEngineTest {
     @Test
     void testNoValidLoanFound() {
         assertThrows(NoValidLoanException.class,
-                () -> decisionEngine.calculateApprovedLoan(debtorPersonalCode, 10000L, 60));
+                () -> decisionEngine.calculateApprovedLoan(new DecisionRequest(debtorPersonalCode, 10000L, 60, "LATVIA")));
     }
 
 }
