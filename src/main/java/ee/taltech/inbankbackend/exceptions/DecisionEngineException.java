@@ -1,5 +1,8 @@
 package ee.taltech.inbankbackend.exceptions;
 
+/**
+ * General exception
+ */
 public class DecisionEngineException extends Throwable {
     private final String message;
     private final Throwable cause;

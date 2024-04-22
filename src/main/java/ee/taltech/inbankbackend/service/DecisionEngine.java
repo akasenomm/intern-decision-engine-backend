@@ -17,18 +17,19 @@ public class DecisionEngine {
 
     /**
      * Calculates the maximum loan amount and period for the customer based on their ID code,
-     * the requested loan amount and the loan period.
+     * the requested loan amount, loan period, and customer country.
      * The loan period must be between 12 and 60 months (inclusive).
      * The loan amount must be between 2000 and 10000€ months (inclusive).
      *
      * @return A Decision object containing the approved loan amount and period, and an error message (if any)
      * @throws NoValidLoanException If there is no valid loan found for the given ID code, loan amount and loan period
+     * @throws InvalidInputException If any user input is invalid
      */
 
-    public Decision calculateApprovedLoan(String personalCode, Long loanAmount, int loanPeriod) throws NoValidLoanException, InvalidInputException {
-        RequestValidator.verifyInputs(personalCode, loanAmount, loanPeriod);
-        modifier = calculateModifier(personalCode);
-        int outputLoanPeriod = adjustLoanPeriod(loanPeriod);
+    public Decision calculateApprovedLoan(DecisionRequest request) throws NoValidLoanException, InvalidInputException {
+        RequestValidator.verifyInputs(request);
+        modifier = calculateModifier(request.getPersonalCode());
+        int outputLoanPeriod = adjustLoanPeriod(request.getLoanPeriod());
         int outputLoanAmount = calculateOutputLoanAmount(outputLoanPeriod);
         return new Decision(outputLoanAmount, outputLoanPeriod, null);
     }
@@ -56,6 +57,12 @@ public class DecisionEngine {
         return DecisionEngineConstants.SEGMENT_3_CREDIT_MODIFIER;
     }
 
+    /**
+     * Calculates loan period for the customer to satisfy minimum and maximum loan amounts
+     * @param loanPeriod requested loan period
+     * @return suggested loan period
+     * @throws NoValidLoanException can not find loan within allowed period
+     */
     private int adjustLoanPeriod(int loanPeriod) throws NoValidLoanException {
         if (highestValidLoanAmount(loanPeriod) < DecisionEngineConstants.MINIMUM_LOAN_AMOUNT) {
             loanPeriod = DecisionEngineConstants.MINIMUM_LOAN_AMOUNT / modifier;
@@ -67,6 +74,11 @@ public class DecisionEngine {
         return loanPeriod;
     }
 
+    /**
+     * Simple function to satisfy maximum loan restriction. Returns whichever is lower
+     * @param loanPeriod Allowed period
+     * @return Calculates max sum based on allowed period. If sum higher than restriction, returns limit.
+     */
     private int calculateOutputLoanAmount(int loanPeriod) {
         return Math.min(DecisionEngineConstants.MAXIMUM_LOAN_AMOUNT, highestValidLoanAmount(loanPeriod));
     }
