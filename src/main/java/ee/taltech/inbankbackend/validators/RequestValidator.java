@@ -4,6 +4,7 @@ import com.github.vladislavgoltjajev.personalcode.exception.PersonalCodeExceptio
 import com.github.vladislavgoltjajev.personalcode.locale.estonia.EstonianPersonalCodeParser;
 import com.github.vladislavgoltjajev.personalcode.locale.estonia.EstonianPersonalCodeValidator;
 import ee.taltech.inbankbackend.config.DecisionEngineConstants;
+import ee.taltech.inbankbackend.config.LifeExpectancyCalculator;
 import ee.taltech.inbankbackend.endpoint.DecisionRequest;
 import ee.taltech.inbankbackend.exceptions.*;
 
@@ -14,21 +15,6 @@ public class RequestValidator {
 
     static final EstonianPersonalCodeValidator validator = new EstonianPersonalCodeValidator();
     static final EstonianPersonalCodeParser parser = new EstonianPersonalCodeParser();
-
-
-    /**
-     * Returns customer expected age based on their country
-     * @param country customer country
-     * @return Customer country expected age as int
-     * @throws InvalidCountryException If country is not allowed
-     */
-    private static int getCustomerExpectedAge(String country) throws InvalidCountryException {
-        if (country.equalsIgnoreCase("ESTONIA")) return DecisionEngineConstants.LIFE_EXPECTANCY_ESTONIA;
-        if (country.equalsIgnoreCase("LATVIA")) return DecisionEngineConstants.LIFE_EXPECTANCY_LATVIA;
-        if (country.equalsIgnoreCase("LITHUANIA")) return DecisionEngineConstants.LIFE_EXPECTANCY_LITHUANIA;
-
-        throw new InvalidCountryException("Invalid country");
-    }
 
     /**
      * Verify that all inputs are valid according to business rules.
@@ -48,7 +34,7 @@ public class RequestValidator {
 
         // Validate customer age
         int customerAge = getCustomerAge(request.getPersonalCode());
-        int maxAllowedAge = getCustomerExpectedAge(request.getCountry()) - DecisionEngineConstants.MAXIMUM_LOAN_PERIOD / 12 ;
+        int maxAllowedAge = LifeExpectancyCalculator.getCustomerExpectedAge(request) - DecisionEngineConstants.MAXIMUM_LOAN_PERIOD / 12 ;
         if (!(DecisionEngineConstants.MINIMUM_CUSTOMER_AGE <= customerAge && maxAllowedAge >= customerAge)) {
             throw new InvalidAgeException("Restricted age");
         }

@@ -13,8 +13,11 @@ public class DecisionEngineConstants {
     public static final Integer SEGMENT_3_CREDIT_MODIFIER = 1000;
     public static final String ERROR_UNEXPECTED = "An unexpected error occurred";
     public static final int MINIMUM_CUSTOMER_AGE = 18;
-    public static final int LIFE_EXPECTANCY_ESTONIA = 76;
-    public static final int LIFE_EXPECTANCY_LATVIA = 73;
-    public static final int LIFE_EXPECTANCY_LITHUANIA = 75;
+    public static final int LIFE_EXPECTANCY_ESTONIA_MALE = 74;
+    public static final int LIFE_EXPECTANCY_ESTONIA_FEMALE = 82;
+    public static final int LIFE_EXPECTANCY_LATVIA_MALE = 68;
+    public static final int LIFE_EXPECTANCY_LATVIA_FEMALE = 78;
+    public static final int LIFE_EXPECTANCY_LITHUANIA_MALE = 69;
+    public static final int LIFE_EXPECTANCY_LITHUANIA_FEMALE = 79;
 
 }
