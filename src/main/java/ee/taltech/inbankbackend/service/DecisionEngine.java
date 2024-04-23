@@ -26,7 +26,7 @@ public class DecisionEngine {
      * @throws InvalidInputException If any user input is invalid
      */
 
-    public Decision calculateApprovedLoan(DecisionRequest request) throws NoValidLoanException, InvalidInputException {
+    public Decision calculateApprovedLoan(DecisionRequest request) throws DecisionEngineException {
         RequestValidator.verifyInputs(request);
         modifier = calculateModifier(request.getPersonalCode());
         int outputLoanPeriod = adjustLoanPeriod(request.getLoanPeriod());

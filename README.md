@@ -37,6 +37,7 @@ The request body must contain the following fields:
 - personalCode: The customer's personal ID code.
 - loanAmount: The requested loan amount.
 - loanPeriod: The requested loan period.
+- country: The customer's country
 
 **Request example:**
 
@@ -44,7 +45,8 @@ The request body must contain the following fields:
 {
 "personalCode": "50307172740",
 "loanAmount": "5000",
-"loanPeriod": "24"
+"loanPeriod": "24",
+"country": "Estonia"
 }
 ```
 
@@ -69,9 +71,11 @@ The response body contains the following fields:
 The following error responses can be returned by the service:
 
 - `400 Bad Request` - in case of an invalid input
-    - `Invalid personal ID code!` - if the provided personal ID code is invalid
-    - `Invalid loan amount!` - if the requested loan amount is invalid
-    - `Invalid loan period!` - if the requested loan period is invalid
+  - `InvalidInputException`
+      - `Invalid personal ID code!` - if the provided personal ID code is invalid
+      - `Invalid loan amount!` - if the requested loan amount is invalid
+      - `Invalid loan period!` - if the requested loan period is invalid
+      - `Restricted age` - if the customer is too old or too young
 - `404 Not Found` - in case no valid loans can be found
     - `No valid loan found!` - if there is no valid loan found for the given ID code, loan amount, and loan period
 - `500 Internal Server Error` - in case the server encounters an unexpected error while processing the request

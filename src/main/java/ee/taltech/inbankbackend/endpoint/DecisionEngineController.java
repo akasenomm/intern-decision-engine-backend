@@ -49,7 +49,7 @@ public class DecisionEngineController {
             return handleBadRequest(e.getMessage());
         } catch (NoValidLoanException e) {
             return handleNotFound(e.getMessage());
-        } catch (Exception e) {
+        } catch (Exception | DecisionEngineException e) {
             return handleInternalServerError();
         }
     }
@@ -61,7 +61,7 @@ public class DecisionEngineController {
      * @throws InvalidInputException request parameter invalid
      * @throws NoValidLoanException customer can not be serviced
      */
-    private ResponseEntity<DecisionResponse> processDecisionRequest(DecisionRequest request) throws InvalidInputException, NoValidLoanException {
+    private ResponseEntity<DecisionResponse> processDecisionRequest(DecisionRequest request) throws DecisionEngineException {
         Decision decision = decisionEngine.calculateApprovedLoan(request);
         DecisionResponse response = buildResponse(decision);
         return ResponseEntity.ok(response);

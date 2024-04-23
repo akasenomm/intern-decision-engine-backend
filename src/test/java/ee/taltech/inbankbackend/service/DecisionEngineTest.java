@@ -37,13 +37,13 @@ class DecisionEngineTest {
     }
     @Test
     void testTooOld() {
-        assertThrows(InvalidAgeException.class,
+        assertThrows(NoValidLoanException.class,
                 () -> decisionEngine.calculateApprovedLoan(new DecisionRequest(overAgePersonalCode, 4000L, 12, "ESTONIA")));
     }
 
     @Test
     void testTooYoung() {
-        assertThrows(InvalidAgeException.class,
+        assertThrows(NoValidLoanException.class,
                 () -> decisionEngine.calculateApprovedLoan(new DecisionRequest(underagePersonalCode, 4000L, 12, "ESTONIA")));
     }
 
@@ -52,14 +52,6 @@ class DecisionEngineTest {
         Decision decision = decisionEngine.calculateApprovedLoan(new DecisionRequest(segment2PersonalCode, 3000L, 60, "ESTONIA"));
         assertEquals(10000, decision.getLoanAmount());
         assertEquals(60, decision.getLoanPeriod());
-    }
-
-    @Test
-    void test() throws InvalidInputException, NoValidLoanException {
-        Decision decision = decisionEngine.calculateApprovedLoan(new DecisionRequest("50211022736", 3000L, 40, "LATVIA"));
-        System.out.println(decision.getLoanAmount());
-        System.out.println(decision.getLoanPeriod());
-        System.out.println(decision.getErrorMessage());
     }
 
 

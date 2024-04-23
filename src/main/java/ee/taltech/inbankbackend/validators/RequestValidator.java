@@ -24,8 +24,7 @@ public class RequestValidator {
      * @throws InvalidLoanAmountException If the requested loan amount is invalid
      * @throws InvalidLoanPeriodException If the requested loan period is invalid
      */
-    public static void verifyInputs(DecisionRequest request)
-            throws InvalidInputException {
+    public static void verifyInputs(DecisionRequest request) throws DecisionEngineException {
 
         // Used to check for the validity of the presented ID code.
         if (!validator.isValid(request.getPersonalCode())) {
@@ -36,7 +35,7 @@ public class RequestValidator {
         int customerAge = getCustomerAge(request.getPersonalCode());
         int maxAllowedAge = LifeExpectancyCalculator.getCustomerExpectedAge(request) - DecisionEngineConstants.MAXIMUM_LOAN_PERIOD / 12 ;
         if (!(DecisionEngineConstants.MINIMUM_CUSTOMER_AGE <= customerAge && maxAllowedAge >= customerAge)) {
-            throw new InvalidAgeException("Restricted age");
+            throw new NoValidLoanException("Restricted age");
         }
 
         if (!(DecisionEngineConstants.MINIMUM_LOAN_AMOUNT <= request.getLoanAmount())
@@ -54,14 +53,14 @@ public class RequestValidator {
      * Calculate customer age from national ID code
      * @param personalCode user's personalCode
      * @return user age
-     * @throws InvalidAgeException Could not get user age
+     * @throws NoValidLoanException Could not get user age
      */
-    private static int getCustomerAge(String personalCode) throws InvalidAgeException {
+    private static int getCustomerAge(String personalCode) throws DecisionEngineException {
         int age;
         try {
             age = parser.getAge(personalCode).getYears();
         } catch (PersonalCodeException e) {
-            throw new InvalidAgeException("Could not extract age from personal code");
+            throw new DecisionEngineException("Could not extract age from personal code");
         }
         return age;
     }
